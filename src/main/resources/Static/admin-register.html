@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Registration - Conference Timer</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .register-container {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        max-width: 500px;
+        width: 100%;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      .header h1 {
+        color: #2c3e50;
+        font-size: 2.5em;
+        margin-bottom: 10px;
+      }
+
+      .header p {
+        color: #7f8c8d;
+        font-size: 1.1em;
+      }
+
+      .form-group {
+        margin-bottom: 25px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 1.1em;
+      }
+
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 15px;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 1em;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: #e74c3c;
+        box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+      }
+
+      .btn {
+        width: 100%;
+        padding: 15px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1.1em;
+        margin: 10px 0;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 1px;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        color: white;
+      }
+
+      .btn-secondary {
+        background: #95a5a6;
+        color: white;
+        text-decoration: none;
+        display: block;
+        text-align: center;
+      }
+
+      .response {
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+        display: none;
+        text-align: center;
+      }
+
+      .success {
+        background: #d4edda;
+        color: #155724;
+        border: 2px solid #c3e6cb;
+      }
+
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 2px solid #f5c6cb;
+      }
+
+      .info-box {
+        background: #fff3cd;
+        border: 2px solid #ffeaa7;
+        color: #856404;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+      }
+
+      .info-box h4 {
+        margin-bottom: 10px;
+      }
+
+      .info-box ul {
+        margin-left: 20px;
+      }
+
+      .info-box li {
+        margin-bottom: 5px;
+      }
+
+      .security-note {
+        background: #f8d7da;
+        border: 2px solid #f5c6cb;
+        color: #721c24;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+        text-align: center;
+      }
+
+      .links {
+        text-align: center;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #e9ecef;
+      }
+
+      .links a {
+        color: #e74c3c;
+        text-decoration: none;
+        margin: 0 15px;
+        font-weight: 500;
+      }
+
+      .links a:hover {
+        text-decoration: underline;
+      }
+
+      .user-type-badge {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.9em;
+        font-weight: 600;
+        display: inline-block;
+        margin-bottom: 20px;
+      }
+
+      .admin-code-group {
+        background: #fff3cd;
+        border: 2px solid #ffeaa7;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 25px;
+      }
+
+      .admin-code-group label {
+        color: #856404 !important;
+        font-weight: 700;
+      }
+
+      .admin-code-group input {
+        border-color: #ffeaa7;
+      }
+
+      .admin-code-group input:focus {
+        border-color: #f39c12;
+        box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.1);
+      }
+
+      @media (max-width: 768px) {
+        .register-container {
+          padding: 30px 20px;
+          margin: 10px;
+        }
+
+        .header h1 {
+          font-size: 2em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="register-container">
+      <!-- Header -->
+      <div class="header">
+        <div class="user-type-badge">👨‍💼 Event Administrator</div>
+        <h1>Create Admin Account</h1>
+        <p>Register to manage events and monitor attendees</p>
+      </div>
+
+      <!-- Security Note -->
+      <div class="security-note">
+        <strong>🔐 Security Notice:</strong> Admin registration requires an
+        administrator code for verification.
+      </div>
+
+      <!-- Registration Form -->
+      <form id="registrationForm">
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            required
+            placeholder="Enter your full name"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            placeholder="Enter your email address"
+          />
+        </div>
+
+        <div class="admin-code-group">
+          <label for="adminCode">Administrator Code</label>
+          <input
+            type="password"
+            id="adminCode"
+            name="adminCode"
+            required
+            placeholder="Enter administrator verification code"
+          />
+          <small
+            style="
+              color: #856404;
+              font-size: 0.9em;
+              margin-top: 5px;
+              display: block;
+            "
+          >
+            💡 For testing, use: <strong>ADMIN2025</strong>
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            required
+            placeholder="Create a secure password"
+            minlength="8"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            required
+            placeholder="Confirm your password"
+          />
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+          🛡️ Create Admin Account
+        </button>
+      </form>
+
+      <!-- Response Message -->
+      <div id="responseMessage" class="response"></div>
+
+      <!-- Info Box -->
+      <div class="info-box">
+        <h4>🔧 What you can do as an administrator:</h4>
+        <ul>
+          <li>Scan QR codes and manage event check-ins</li>
+          <li>Control timer sessions (start, stop, breaks)</li>
+          <li>Monitor all attendees in real-time</li>
+          <li>Generate comprehensive event reports</li>
+          <li>Export attendance data to CSV</li>
+          <li>Manage multiple events and users</li>
+        </ul>
+      </div>
+
+      <!-- Links -->
+      <div class="links">
+        <a href="/admin-login.html">Already have an admin account? Login</a>
+        <br /><br />
+        <a href="/user-register.html">Register as Attendee</a>
+        |
+        <a href="/index.html">Back to Home</a>
+      </div>
+    </div>
+
+    <script>
+      document
+        .getElementById("registrationForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          // Get form data
+          const formData = {
+            name: document.getElementById("name").value,
+            email: document.getElementById("email").value,
+            adminCode: document.getElementById("adminCode").value,
+            password: document.getElementById("password").value,
+            confirmPassword: document.getElementById("confirmPassword").value,
+            role: "ADMIN", // Set role as ADMIN for administrators
+          };
+
+          // Validate admin code
+          if (formData.adminCode !== "ADMIN2025") {
+            showResponse(
+              "❌ Invalid administrator code. Please contact your system administrator.",
+              "error"
+            );
+            return;
+          }
+
+          // Validate passwords match
+          if (formData.password !== formData.confirmPassword) {
+            showResponse(
+              "❌ Passwords do not match. Please try again.",
+              "error"
+            );
+            return;
+          }
+
+          // Validate password strength
+          if (formData.password.length < 8) {
+            showResponse(
+              "❌ Password must be at least 8 characters long for admin accounts.",
+              "error"
+            );
+            return;
+          }
+
+          try {
+            const response = await fetch("/auth/signup", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                name: formData.name,
+                email: formData.email,
+                password: formData.password,
+                role: formData.role,
+              }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+              showResponse(
+                "🎉 Administrator account created successfully! You now have full system access.",
+                "success"
+              );
+
+              // Clear form
+              document.getElementById("registrationForm").reset();
+
+              // Redirect to admin login page after 3 seconds
+              setTimeout(() => {
+                window.location.href = "/admin-login.html";
+              }, 3000);
+            } else {
+              showResponse(
+                `❌ Registration failed: ${data.message || "Please try again"}`,
+                "error"
+              );
+            }
+          } catch (error) {
+            showResponse(
+              `❌ Network error: ${error.message}. Please check your connection.`,
+              "error"
+            );
+          }
+        });
+
+      function showResponse(message, type) {
+        const responseElement = document.getElementById("responseMessage");
+        responseElement.textContent = message;
+        responseElement.className = `response ${type}`;
+        responseElement.style.display = "block";
+
+        // Hide after 8 seconds for error, keep visible for success
+        if (type === "error") {
+          setTimeout(() => {
+            responseElement.style.display = "none";
+          }, 8000);
+        }
+      }
+
+      // Real-time password validation
+      document
+        .getElementById("confirmPassword")
+        .addEventListener("input", function () {
+          const password = document.getElementById("password").value;
+          const confirmPassword = this.value;
+
+          if (confirmPassword && password !== confirmPassword) {
+            this.style.borderColor = "#e74c3c";
+          } else {
+            this.style.borderColor = "#e9ecef";
+          }
+        });
+
+      // Admin code validation
+      document
+        .getElementById("adminCode")
+        .addEventListener("input", function () {
+          const adminCode = this.value;
+          if (adminCode && adminCode !== "ADMIN2025") {
+            this.style.borderColor = "#e74c3c";
+          } else {
+            this.style.borderColor = "#ffeaa7";
+          }
+        });
+    </script>
+  </body>
+</html>

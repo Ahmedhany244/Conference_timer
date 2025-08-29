@@ -1,58 +1,300 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Conference Timer - Auth</title>
-</head>
-<body>
-<h2>Register</h2>
-<form id="registerForm">
-    <input type="text" id="regName" placeholder="Name" required><br>
-    <input type="email" id="regEmail" placeholder="Email" required><br>
-    <input type="password" id="regPassword" placeholder="Password" required><br>
-    <button type="submit">Register</button>
-</form>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Conference Timer System</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-<h2>Login</h2>
-<form id="loginForm">
-    <input type="email" id="loginEmail" placeholder="Email" required><br>
-    <input type="password" id="loginPassword" placeholder="Password" required><br>
-    <button type="submit">Login</button>
-</form>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
 
-<p id="response"></p>
+      .landing-container {
+        background: white;
+        border-radius: 20px;
+        padding: 50px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        max-width: 900px;
+        width: 100%;
+      }
 
-<script>
-    const responseEl = document.getElementById("response");
+      .hero {
+        margin-bottom: 50px;
+      }
 
-    document.getElementById("registerForm").addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const body = {
-            name: document.getElementById("regName").value,
-            email: document.getElementById("regEmail").value,
-            password: document.getElementById("regPassword").value
-        };
-        const res = await fetch("/api/users/register", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body)
-        });
-        responseEl.innerText = await res.text();
-    });
+      .hero h1 {
+        color: #2c3e50;
+        font-size: 3.5em;
+        margin-bottom: 20px;
+        font-weight: 700;
+      }
 
-    document.getElementById("loginForm").addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const body = {
-            email: document.getElementById("loginEmail").value,
-            password: document.getElementById("loginPassword").value
-        };
-        const res = await fetch("/api/users/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body)
-        });
-        responseEl.innerText = await res.text();
-    });
-</script>
-</body>
+      .hero p {
+        color: #7f8c8d;
+        font-size: 1.4em;
+        line-height: 1.6;
+        margin-bottom: 30px;
+      }
+
+      .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 30px;
+        margin: 50px 0;
+      }
+
+      .feature-card {
+        background: #f8f9fa;
+        padding: 30px;
+        border-radius: 15px;
+        border-top: 4px solid #3498db;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      }
+
+      .feature-card h3 {
+        color: #2c3e50;
+        font-size: 1.5em;
+        margin-bottom: 15px;
+      }
+
+      .feature-card p {
+        color: #7f8c8d;
+        line-height: 1.5;
+      }
+
+      .user-types {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        margin: 50px 0;
+      }
+
+      .user-type-card {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        color: white;
+        padding: 40px;
+        border-radius: 15px;
+        text-align: center;
+        transition: transform 0.3s ease;
+      }
+
+      .user-type-card:hover {
+        transform: translateY(-3px);
+      }
+
+      .user-type-card.admin {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+      }
+
+      .user-type-card h3 {
+        font-size: 2em;
+        margin-bottom: 20px;
+      }
+
+      .user-type-card p {
+        font-size: 1.1em;
+        margin-bottom: 30px;
+        opacity: 0.9;
+      }
+
+      .btn {
+        padding: 15px 30px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1.1em;
+        margin: 10px;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn-primary {
+        background: white;
+        color: #3498db;
+      }
+
+      .btn-admin {
+        background: white;
+        color: #e74c3c;
+      }
+
+      .btn-outline {
+        background: transparent;
+        color: white;
+        border: 2px solid white;
+      }
+
+      .btn-secondary {
+        background: #95a5a6;
+        color: white;
+      }
+
+      .quick-access {
+        margin-top: 50px;
+        padding: 30px;
+        background: #ecf0f1;
+        border-radius: 15px;
+      }
+
+      .quick-access h3 {
+        color: #2c3e50;
+        margin-bottom: 20px;
+      }
+
+      .quick-links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+      }
+
+      .footer {
+        margin-top: 40px;
+        color: #7f8c8d;
+        font-size: 0.9em;
+      }
+
+      @media (max-width: 768px) {
+        .landing-container {
+          padding: 30px 20px;
+        }
+
+        .hero h1 {
+          font-size: 2.5em;
+        }
+
+        .user-types {
+          grid-template-columns: 1fr;
+        }
+
+        .quick-links {
+          flex-direction: column;
+          align-items: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="landing-container">
+      <!-- Hero Section -->
+      <div class="hero">
+        <h1>⏱️ Conference Timer</h1>
+        <p>
+          Professional event attendance tracking and time management system with
+          QR code integration, real-time monitoring, and comprehensive
+          reporting.
+        </p>
+      </div>
+
+      <!-- Features Section -->
+      <div class="features">
+        <div class="feature-card">
+          <h3>📱 QR Code System</h3>
+          <p>
+            Secure attendance tracking with JWT-based QR codes. Generate, scan,
+            and verify attendance seamlessly.
+          </p>
+        </div>
+        <div class="feature-card">
+          <h3>⏰ Real-time Timers</h3>
+          <p>
+            Live timer tracking with break management. Monitor active time,
+            breaks, and participation rates in real-time.
+          </p>
+        </div>
+        <div class="feature-card">
+          <h3>👨‍💼 Admin Dashboard</h3>
+          <p>
+            Comprehensive admin controls for managing timers, breaks, and
+            monitoring all attendees from a single interface.
+          </p>
+        </div>
+        <div class="feature-card">
+          <h3>📊 Analytics & Reports</h3>
+          <p>
+            Detailed reporting with CSV export, performance analytics, and break
+            statistics for complete event insights.
+          </p>
+        </div>
+      </div>
+
+      <!-- User Types -->
+      <div class="user-types">
+        <div class="user-type-card">
+          <h3>👤 Conference Attendee</h3>
+          <p>
+            Register as an attendee to generate QR codes, track your
+            participation time, and view your personal timer dashboard.
+          </p>
+          <a href="/user-register.html" class="btn btn-primary">Register</a>
+          <a href="/user-login.html" class="btn btn-outline">Login</a>
+        </div>
+
+        <div class="user-type-card admin">
+          <h3>👨‍💼 Event Administrator</h3>
+          <p>
+            Register as an admin to manage events, scan QR codes, control
+            timers, and generate comprehensive reports.
+          </p>
+          <a href="/admin-register.html" class="btn btn-admin">Register</a>
+          <a href="/admin-login.html" class="btn btn-outline">Login</a>
+        </div>
+      </div>
+
+      <!-- Quick Access -->
+      <div class="quick-access">
+        <h3>🚀 Quick Access (Testing)</h3>
+        <div class="quick-links">
+          <a href="/qr-test.html" class="btn btn-secondary">QR Test Page</a>
+          <a href="/admin-dashboard.html" class="btn btn-secondary">
+            Admin Dashboard
+          </a>
+          <a href="/timer-display.html" class="btn btn-secondary">
+            Timer Display
+          </a>
+          <a href="/reports-dashboard.html" class="btn btn-secondary">
+            Reports Dashboard
+          </a>
+          <a href="/test-helper.html" class="btn btn-secondary">
+            Test Helper
+          </a>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        <p>
+          🏢 Conference Timer System - Professional event management solution
+        </p>
+        <p>Built with Spring Boot, JWT Security, and Real-time Updates</p>
+      </div>
+    </div>
+  </body>
 </html>

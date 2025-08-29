@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Conference Timer - My Timer</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .timer-container {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        max-width: 600px;
+        width: 100%;
+      }
+
+      .header {
+        margin-bottom: 30px;
+      }
+
+      .header h1 {
+        color: #2c3e50;
+        font-size: 2.5em;
+        margin-bottom: 10px;
+      }
+
+      .header p {
+        color: #7f8c8d;
+        font-size: 1.2em;
+      }
+
+      .login-section {
+        margin-bottom: 30px;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 10px;
+      }
+
+      .event-selection {
+        margin-bottom: 30px;
+        padding: 20px;
+        background: #e8f4f8;
+        border-radius: 10px;
+      }
+
+      .timer-display {
+        display: none;
+        margin-bottom: 30px;
+      }
+
+      .timer-circle {
+        width: 250px;
+        height: 250px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: 20px auto;
+        color: white;
+        box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .timer-circle::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: conic-gradient(
+          from 0deg,
+          transparent 0deg,
+          rgba(255, 255, 255, 0.2) var(--progress, 0deg),
+          transparent var(--progress, 0deg)
+        );
+        border-radius: 50%;
+      }
+
+      .timer-time {
+        font-size: 3em;
+        font-weight: bold;
+        z-index: 1;
+      }
+
+      .timer-label {
+        font-size: 1.2em;
+        opacity: 0.9;
+        z-index: 1;
+      }
+
+      .status-indicator {
+        display: inline-block;
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-weight: bold;
+        font-size: 1.1em;
+        margin: 10px;
+        text-transform: uppercase;
+      }
+
+      .status-active {
+        background: #d4edda;
+        color: #155724;
+        border: 2px solid #27ae60;
+      }
+
+      .status-break {
+        background: #fff3cd;
+        color: #856404;
+        border: 2px solid #f39c12;
+        animation: pulse 2s infinite;
+      }
+
+      .status-stopped {
+        background: #f8d7da;
+        color: #721c24;
+        border: 2px solid #e74c3c;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin: 30px 0;
+      }
+
+      .stat-card {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        border-left: 4px solid #3498db;
+      }
+
+      .stat-value {
+        font-size: 2em;
+        font-weight: bold;
+        color: #2c3e50;
+        margin-bottom: 5px;
+      }
+
+      .stat-label {
+        color: #7f8c8d;
+        font-size: 0.9em;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+        text-align: left;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #2c3e50;
+      }
+
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e9ecef;
+        border-radius: 5px;
+        font-size: 1em;
+        transition: border-color 0.3s ease;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: #3498db;
+      }
+
+      .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        margin: 5px;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 1px;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn-primary {
+        background: #3498db;
+        color: white;
+      }
+
+      .btn-success {
+        background: #27ae60;
+        color: white;
+      }
+
+      .btn-warning {
+        background: #f39c12;
+        color: white;
+      }
+
+      .btn-danger {
+        background: #e74c3c;
+        color: white;
+      }
+
+      .response {
+        padding: 15px;
+        border-radius: 5px;
+        margin: 15px 0;
+      }
+
+      .success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      .break-info {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 20px 0;
+        display: none;
+      }
+
+      .break-info h3 {
+        color: #856404;
+        margin-bottom: 10px;
+      }
+
+      .break-details {
+        color: #856404;
+        font-size: 0.9em;
+      }
+
+      .refresh-indicator {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #3498db;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 25px;
+        font-size: 0.9em;
+        display: none;
+        animation: fadeInOut 2s ease-in-out;
+      }
+
+      @keyframes fadeInOut {
+        0%,
+        100% {
+          opacity: 0;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+
+      .event-info {
+        background: #e8f4f8;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 20px 0;
+        border-left: 4px solid #3498db;
+      }
+
+      .event-info h3 {
+        color: #2c3e50;
+        margin-bottom: 10px;
+      }
+
+      .event-details {
+        color: #7f8c8d;
+        font-size: 0.9em;
+      }
+
+      @media (max-width: 768px) {
+        .timer-container {
+          padding: 20px;
+        }
+
+        .timer-circle {
+          width: 200px;
+          height: 200px;
+        }
+
+        .timer-time {
+          font-size: 2.5em;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .header h1 {
+          font-size: 2em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="timer-container">
+      <!-- Header -->
+      <div class="header">
+        <h1>⏱️ My Conference Timer</h1>
+        <p>Track your event participation time</p>
+      </div>
+
+      <!-- Login Section -->
+      <div class="login-section" id="loginSection">
+        <h3>Login to View Your Timer</h3>
+        <div class="form-group">
+          <label>Email</label>
+          <input
+            type="email"
+            id="userEmail"
+            placeholder="Enter your email"
+            value="test@example.com"
+          />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input
+            type="password"
+            id="userPassword"
+            placeholder="Enter your password"
+            value="password"
+          />
+        </div>
+        <button class="btn btn-primary" onclick="loginUser()">Login</button>
+        <div id="loginResponse" class="response" style="display: none"></div>
+      </div>
+
+      <!-- Event Selection -->
+      <div class="event-selection" id="eventSelection" style="display: none">
+        <h3>Select Event</h3>
+        <div class="form-group">
+          <label>Choose Your Event</label>
+          <select id="eventSelect" onchange="loadUserTimer()">
+            <option value="">Select an event...</option>
+            <option value="1">Spring Boot Conference 2025</option>
+            <option value="2">QR Code Workshop</option>
+            <option value="3">Past Tech Meetup</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Timer Display -->
+      <div class="timer-display" id="timerDisplay">
+        <!-- Event Info -->
+        <div class="event-info" id="eventInfo">
+          <h3 id="eventName">Event Name</h3>
+          <div class="event-details" id="eventDetails">
+            Event details will appear here
+          </div>
+        </div>
+
+        <!-- Status Indicator -->
+        <div id="statusIndicator" class="status-indicator status-stopped">
+          Not Started
+        </div>
+
+        <!-- Timer Circle -->
+        <div class="timer-circle" id="timerCircle">
+          <div class="timer-time" id="currentTime">00:00:00</div>
+          <div class="timer-label" id="timerLabel">Active Time</div>
+        </div>
+
+        <!-- Break Information -->
+        <div class="break-info" id="breakInfo">
+          <h3>⏸️ You're Currently on Break</h3>
+          <div class="break-details" id="breakDetails">
+            Break started at: <span id="breakStartTime">--:--</span><br />
+            Break duration: <span id="breakDuration">00:00:00</span>
+          </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="totalActiveTime">00:00:00</div>
+            <div class="stat-label">Total Active Time</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="totalBreakTime">00:00:00</div>
+            <div class="stat-label">Total Break Time</div>
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div style="margin-top: 30px">
+          <button class="btn btn-primary" onclick="refreshTimer()">
+            🔄 Refresh
+          </button>
+          <button class="btn btn-warning" onclick="showQRCode()">
+            📱 Show QR Code
+          </button>
+        </div>
+      </div>
+
+      <!-- Refresh Indicator -->
+      <div class="refresh-indicator" id="refreshIndicator">Timer Updated</div>
+    </div>
+
+    <script>
+      let authToken = "";
+      let currentUserId = null;
+      let currentEventId = null;
+      let timerInterval = null;
+      let refreshInterval = null;
+
+      // Login functionality
+      async function loginUser() {
+        const email = document.getElementById("userEmail").value;
+        const password = document.getElementById("userPassword").value;
+
+        try {
+          const response = await fetch("/auth/signin", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            authToken = data.token;
+
+            // Extract user ID from token (simplified - in production, decode JWT properly)
+            // For now, we'll use the test user IDs we know
+            if (email === "test@example.com") currentUserId = 1;
+            else if (email === "john@example.com") currentUserId = 2;
+            else currentUserId = 1; // default
+
+            showResponse("loginResponse", "Login successful!", "success");
+
+            // Show event selection
+            document.getElementById("loginSection").style.display = "none";
+            document.getElementById("eventSelection").style.display = "block";
+          } else {
+            showResponse(
+              "loginResponse",
+              `Login failed: ${data.message || "Unknown error"}`,
+              "error"
+            );
+          }
+        } catch (error) {
+          showResponse(
+            "loginResponse",
+            `Login error: ${error.message}`,
+            "error"
+          );
+        }
+      }
+
+      // Load user timer for selected event
+      async function loadUserTimer() {
+        const eventId = document.getElementById("eventSelect").value;
+        if (!eventId || !authToken || !currentUserId) return;
+
+        currentEventId = eventId;
+
+        try {
+          const response = await fetch(
+            `/api/timer/session/${currentUserId}/${eventId}`,
+            {
+              headers: { Authorization: `Bearer ${authToken}` },
+            }
+          );
+
+          if (response.ok) {
+            const timerData = await response.json();
+            displayTimerData(timerData);
+
+            // Show timer display
+            document.getElementById("eventSelection").style.display = "none";
+            document.getElementById("timerDisplay").style.display = "block";
+
+            // Start auto-refresh
+            startAutoRefresh();
+          } else {
+            // No timer session found - user hasn't checked in yet
+            displayNoTimerMessage();
+            document.getElementById("eventSelection").style.display = "none";
+            document.getElementById("timerDisplay").style.display = "block";
+          }
+        } catch (error) {
+          console.error("Error loading timer:", error);
+          displayNoTimerMessage();
+          document.getElementById("eventSelection").style.display = "none";
+          document.getElementById("timerDisplay").style.display = "block";
+        }
+      }
+
+      // Display timer data
+      function displayTimerData(data) {
+        // Update event info
+        document.getElementById("eventName").textContent = data.eventName;
+        document.getElementById(
+          "eventDetails"
+        ).textContent = `Session started: ${formatDateTime(
+          data.sessionStartTime
+        )}`;
+
+        // Update status
+        updateStatus(data);
+
+        // Update timer display
+        document.getElementById("totalActiveTime").textContent =
+          data.formattedActiveTime || "00:00:00";
+        document.getElementById("totalBreakTime").textContent =
+          data.formattedBreakTime || "00:00:00";
+
+        // Handle break information
+        if (
+          data.isOnBreak &&
+          data.breakRecords &&
+          data.breakRecords.length > 0
+        ) {
+          const currentBreak = data.breakRecords.find(
+            (br) => br.active || !br.breakEndTime
+          );
+          if (currentBreak) {
+            document.getElementById("breakInfo").style.display = "block";
+            document.getElementById("breakStartTime").textContent =
+              formatDateTime(currentBreak.breakStartTime);
+
+            // Start break timer
+            startBreakTimer(currentBreak.breakStartTime);
+          }
+        } else {
+          document.getElementById("breakInfo").style.display = "none";
+        }
+
+        // Start live timer if active
+        if (data.isActive && !data.isOnBreak) {
+          startLiveTimer(data.totalActiveTime || 0);
+        } else {
+          document.getElementById("currentTime").textContent =
+            data.formattedActiveTime || "00:00:00";
+          document.getElementById("timerLabel").textContent =
+            "Total Active Time";
+        }
+      }
+
+      // Update status indicator
+      function updateStatus(data) {
+        const statusEl = document.getElementById("statusIndicator");
+
+        if (!data.isActive) {
+          statusEl.className = "status-indicator status-stopped";
+          statusEl.textContent = "⏹️ Timer Stopped";
+        } else if (data.isOnBreak) {
+          statusEl.className = "status-indicator status-break";
+          statusEl.textContent = "⏸️ On Break";
+        } else {
+          statusEl.className = "status-indicator status-active";
+          statusEl.textContent = "▶️ Timer Active";
+        }
+      }
+
+      // Display message when no timer session exists
+      function displayNoTimerMessage() {
+        document.getElementById("eventName").textContent = "No Timer Session";
+        document.getElementById("eventDetails").textContent =
+          "You haven't checked in for this event yet. Please scan your QR code at the event entrance.";
+
+        const statusEl = document.getElementById("statusIndicator");
+        statusEl.className = "status-indicator status-stopped";
+        statusEl.textContent = "❌ Not Checked In";
+
+        document.getElementById("currentTime").textContent = "00:00:00";
+        document.getElementById("timerLabel").textContent = "Please Check In";
+        document.getElementById("totalActiveTime").textContent = "00:00:00";
+        document.getElementById("totalBreakTime").textContent = "00:00:00";
+      }
+
+      // Start live timer for active time
+      function startLiveTimer(initialSeconds) {
+        clearInterval(timerInterval);
+        let currentSeconds = initialSeconds;
+
+        timerInterval = setInterval(() => {
+          currentSeconds++;
+          document.getElementById("currentTime").textContent =
+            formatSeconds(currentSeconds);
+          document.getElementById("timerLabel").textContent =
+            "Active Time (Live)";
+
+          // Update progress circle (optional visual enhancement)
+          updateTimerCircle(currentSeconds);
+        }, 1000);
+      }
+
+      // Start break timer
+      function startBreakTimer(breakStartTime) {
+        const startTime = new Date(breakStartTime);
+
+        const updateBreakDuration = () => {
+          const now = new Date();
+          const diffMs = now - startTime;
+          const diffSeconds = Math.floor(diffMs / 1000);
+          document.getElementById("breakDuration").textContent =
+            formatSeconds(diffSeconds);
+        };
+
+        updateBreakDuration();
+        setInterval(updateBreakDuration, 1000);
+      }
+
+      // Update timer circle visual progress
+      function updateTimerCircle(seconds) {
+        const circle = document.getElementById("timerCircle");
+        const hoursInSeconds = 8 * 3600; // 8 hour workday
+        const progress = Math.min((seconds / hoursInSeconds) * 360, 360);
+        circle.style.setProperty("--progress", `${progress}deg`);
+      }
+
+      // Auto-refresh functionality
+      function startAutoRefresh() {
+        clearInterval(refreshInterval);
+        refreshInterval = setInterval(() => {
+          if (currentUserId && currentEventId && authToken) {
+            refreshTimer();
+          }
+        }, 30000); // Refresh every 30 seconds
+      }
+
+      // Refresh timer data
+      async function refreshTimer() {
+        if (!currentUserId || !currentEventId || !authToken) return;
+
+        try {
+          const response = await fetch(
+            `/api/timer/session/${currentUserId}/${currentEventId}`,
+            {
+              headers: { Authorization: `Bearer ${authToken}` },
+            }
+          );
+
+          if (response.ok) {
+            const timerData = await response.json();
+            displayTimerData(timerData);
+            showRefreshIndicator();
+          }
+        } catch (error) {
+          console.error("Error refreshing timer:", error);
+        }
+      }
+
+      // Show refresh indicator
+      function showRefreshIndicator() {
+        const indicator = document.getElementById("refreshIndicator");
+        indicator.style.display = "block";
+        setTimeout(() => {
+          indicator.style.display = "none";
+        }, 2000);
+      }
+
+      // Show QR code (redirect to QR test page)
+      function showQRCode() {
+        if (confirm("Redirect to QR code generation page?")) {
+          window.open("/qr-test.html", "_blank");
+        }
+      }
+
+      // Utility functions
+      function formatSeconds(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = seconds % 60;
+        return `${hours.toString().padStart(2, "0")}:${minutes
+          .toString()
+          .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+      }
+
+      function formatDateTime(dateTime) {
+        if (!dateTime) return "--:--";
+        return new Date(dateTime).toLocaleString();
+      }
+
+      function showResponse(elementId, message, type) {
+        const element = document.getElementById(elementId);
+        element.textContent = message;
+        element.className = `response ${type}`;
+        element.style.display = "block";
+        setTimeout(() => {
+          element.style.display = "none";
+        }, 5000);
+      }
+
+      // Cleanup intervals when page unloads
+      window.addEventListener("beforeunload", () => {
+        clearInterval(timerInterval);
+        clearInterval(refreshInterval);
+      });
+    </script>
+  </body>
+</html>

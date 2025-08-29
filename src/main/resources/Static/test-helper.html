@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Conference Timer - Test Helper</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+        margin: 0;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #2c3e50;
+      }
+
+      .section {
+        margin-bottom: 30px;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 10px;
+        border-left: 4px solid #3498db;
+      }
+
+      .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        margin: 5px;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 1px;
+      }
+
+      .btn-danger {
+        background: #e74c3c;
+        color: white;
+      }
+
+      .btn-warning {
+        background: #f39c12;
+        color: white;
+      }
+
+      .btn-info {
+        background: #3498db;
+        color: white;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 600;
+        color: #2c3e50;
+      }
+
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #e9ecef;
+        border-radius: 5px;
+        font-size: 1em;
+      }
+
+      .response {
+        padding: 15px;
+        border-radius: 5px;
+        margin: 15px 0;
+        display: none;
+      }
+
+      .success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      .info-box {
+        background: #d1ecf1;
+        border: 1px solid #bee5eb;
+        color: #0c5460;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 15px 0;
+      }
+
+      .test-info {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        color: #856404;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 15px 0;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+      }
+
+      @media (max-width: 768px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🧪 Conference Timer Test Helper</h1>
+        <p>Tools to help with testing the conference timer system</p>
+      </div>
+
+      <!-- Authentication -->
+      <div class="section">
+        <h3>🔐 Admin Authentication</h3>
+        <div class="grid">
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="adminEmail" value="admin@example.com" />
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="adminPassword" value="admin123" />
+          </div>
+        </div>
+        <button class="btn btn-info" onclick="loginAdmin()">
+          🔑 Login as Admin
+        </button>
+        <div id="authResponse" class="response"></div>
+      </div>
+
+      <!-- Test Information -->
+      <div class="section">
+        <h3>📊 Test Information</h3>
+        <button class="btn btn-info" onclick="getTestInfo()">
+          📋 Get Test Info
+        </button>
+        <div id="testInfoDisplay" class="test-info" style="display: none"></div>
+      </div>
+
+      <!-- Clear Data Options -->
+      <div class="section">
+        <h3>🗑️ Clear Test Data</h3>
+        <div class="info-box">
+          <strong>⚠️ Warning:</strong> These actions will delete data. Use only
+          for testing!
+        </div>
+
+        <h4>Clear All Data</h4>
+        <button class="btn btn-danger" onclick="clearAllData()">
+          🗑️ Clear All Attendance Data
+        </button>
+
+        <h4>Clear Specific User Data</h4>
+        <div class="grid">
+          <div class="form-group">
+            <label>User ID</label>
+            <select id="clearUserId">
+              <option value="1">User 1 (test@example.com)</option>
+              <option value="2">User 2 (john@example.com)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Event ID</label>
+            <select id="clearEventId">
+              <option value="1">Spring Boot Conference 2025</option>
+              <option value="2">QR Code Workshop</option>
+              <option value="3">Past Tech Meetup</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-warning" onclick="clearUserData()">
+          🗑️ Clear User's Event Data
+        </button>
+
+        <div id="clearResponse" class="response"></div>
+      </div>
+
+      <!-- Testing Instructions -->
+      <div class="section">
+        <h3>📖 Testing Instructions</h3>
+        <div class="info-box">
+          <h4>🎯 How to Fix "User has already checked in" Error:</h4>
+          <ol>
+            <li>
+              <strong>Option 1:</strong> Use different users for testing (User 1
+              and User 2)
+            </li>
+            <li>
+              <strong>Option 2:</strong> Clear specific user's data using the
+              form above
+            </li>
+            <li>
+              <strong>Option 3:</strong> Clear all test data and start fresh
+            </li>
+            <li>
+              <strong>Option 4:</strong> Use different events for the same user
+            </li>
+          </ol>
+
+          <h4>🔄 Testing Flow:</h4>
+          <ol>
+            <li>Login as Admin here</li>
+            <li>Clear any existing test data</li>
+            <li>
+              Go to <a href="/qr-test.html" target="_blank">QR Test Page</a>
+            </li>
+            <li>Generate QR as User 1, scan as Admin</li>
+            <li>Generate QR as User 2, scan as Admin</li>
+            <li>
+              Test admin controls on
+              <a href="/admin-dashboard.html" target="_blank"
+                >Admin Dashboard</a
+              >
+            </li>
+            <li>
+              View reports on
+              <a href="/reports-dashboard.html" target="_blank"
+                >Reports Dashboard</a
+              >
+            </li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="section">
+        <h3>🔗 Quick Links</h3>
+        <a href="/qr-test.html" target="_blank" class="btn btn-info"
+          >📱 QR Test Page</a
+        >
+        <a href="/admin-dashboard.html" target="_blank" class="btn btn-info"
+          >👨‍💼 Admin Dashboard</a
+        >
+        <a href="/timer-display.html" target="_blank" class="btn btn-info"
+          >⏱️ Timer Display</a
+        >
+        <a href="/reports-dashboard.html" target="_blank" class="btn btn-info"
+          >📊 Reports Dashboard</a
+        >
+      </div>
+    </div>
+
+    <script>
+      let authToken = "";
+
+      // Login as admin
+      async function loginAdmin() {
+        const email = document.getElementById("adminEmail").value;
+        const password = document.getElementById("adminPassword").value;
+
+        try {
+          const response = await fetch("/auth/signin", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            authToken = data.token;
+            showResponse(
+              "authResponse",
+              "✅ Admin login successful!",
+              "success"
+            );
+          } else {
+            showResponse(
+              "authResponse",
+              `❌ Login failed: ${data.message}`,
+              "error"
+            );
+          }
+        } catch (error) {
+          showResponse(
+            "authResponse",
+            `❌ Login error: ${error.message}`,
+            "error"
+          );
+        }
+      }
+
+      // Get test information
+      async function getTestInfo() {
+        if (!authToken) {
+          alert("Please login as admin first");
+          return;
+        }
+
+        try {
+          const response = await fetch("/api/test/info", {
+            headers: { Authorization: `Bearer ${authToken}` },
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            const infoDiv = document.getElementById("testInfoDisplay");
+            infoDiv.innerHTML = `
+                        <h4>📊 Current Data:</h4>
+                        <p><strong>Total Attendances:</strong> ${data.totalAttendances}</p>
+                        <p><strong>Total Timer Sessions:</strong> ${data.totalTimerSessions}</p>
+                        <p><strong>Total Break Records:</strong> ${data.totalBreakRecords}</p>
+                        
+                        <h4>👤 Test Users:</h4>
+                        <ul>
+                            <li>${data.testUsers.user1}</li>
+                            <li>${data.testUsers.user2}</li>
+                            <li>${data.testUsers.admin}</li>
+                        </ul>
+                        
+                        <h4>📅 Test Events:</h4>
+                        <ul>
+                            <li>${data.testEvents.event1}</li>
+                            <li>${data.testEvents.event2}</li>
+                            <li>${data.testEvents.event3}</li>
+                        </ul>
+                    `;
+            infoDiv.style.display = "block";
+          } else {
+            alert(`Failed to get test info: ${data.error}`);
+          }
+        } catch (error) {
+          alert(`Error: ${error.message}`);
+        }
+      }
+
+      // Clear all data
+      async function clearAllData() {
+        if (!authToken) {
+          alert("Please login as admin first");
+          return;
+        }
+
+        if (
+          !confirm(
+            "⚠️ This will delete ALL attendance, timer, and break data. Continue?"
+          )
+        ) {
+          return;
+        }
+
+        try {
+          const response = await fetch("/api/test/clear-attendance", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${authToken}` },
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            showResponse(
+              "clearResponse",
+              "✅ All test data cleared successfully!",
+              "success"
+            );
+            getTestInfo(); // Refresh info
+          } else {
+            showResponse(
+              "clearResponse",
+              `❌ Failed to clear data: ${data.error}`,
+              "error"
+            );
+          }
+        } catch (error) {
+          showResponse("clearResponse", `❌ Error: ${error.message}`, "error");
+        }
+      }
+
+      // Clear specific user data
+      async function clearUserData() {
+        if (!authToken) {
+          alert("Please login as admin first");
+          return;
+        }
+
+        const userId = document.getElementById("clearUserId").value;
+        const eventId = document.getElementById("clearEventId").value;
+
+        if (
+          !confirm(
+            `⚠️ This will clear data for User ${userId} in Event ${eventId}. Continue?`
+          )
+        ) {
+          return;
+        }
+
+        try {
+          const response = await fetch("/api/test/clear-user-attendance", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userId: parseInt(userId),
+              eventId: parseInt(eventId),
+            }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            showResponse(
+              "clearResponse",
+              "✅ User data cleared successfully!",
+              "success"
+            );
+            getTestInfo(); // Refresh info
+          } else {
+            showResponse(
+              "clearResponse",
+              `❌ Failed to clear user data: ${data.error}`,
+              "error"
+            );
+          }
+        } catch (error) {
+          showResponse("clearResponse", `❌ Error: ${error.message}`, "error");
+        }
+      }
+
+      // Utility function to show responses
+      function showResponse(elementId, message, type) {
+        const element = document.getElementById(elementId);
+        element.textContent = message;
+        element.className = `response ${type}`;
+        element.style.display = "block";
+        setTimeout(() => {
+          element.style.display = "none";
+        }, 5000);
+      }
+    </script>
+  </body>
+</html>

@@ -14,6 +14,14 @@ public class User {
      @Column(nullable = false)
      private String password;
 
+     @Enumerated(EnumType.STRING)
+     @Column(nullable = false)
+     private Role role = Role.USER;
+
+     public enum Role {
+         USER, ADMIN
+     }
+
         public Long getId() {
 		return id;
 	}
@@ -46,7 +54,12 @@ public class User {
 		 this.password = password;
 	 }
 
-		
+	 public Role getRole() {
+		 return role;
+	 }
 
+	 public void setRole(Role role) {
+		 this.role = role;
+	 }
 
 }

@@ -12,15 +12,17 @@ import com.global.hr.Entity.User;
 public class UserDetailsImpl implements UserDetails{
 	 private String email;
 	    private String password;
+	    private User.Role role;
 
 	    public UserDetailsImpl(User user) {
 	        this.email = user.getEmail();
 	        this.password = user.getPassword();
+	        this.role = user.getRole();
 	    }
 
 	    @Override
 	    public Collection<? extends GrantedAuthority> getAuthorities() {
-	        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+	        return List.of(new SimpleGrantedAuthority("ROLE_" + role.toString()));
 	    }
 
 	    @Override public String getPassword() { return password; }

@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Conference Timer - Reports Dashboard</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .reports-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+      }
+
+      .reports-header {
+        background: linear-gradient(135deg, #2c3e50, #3498db);
+        color: white;
+        padding: 30px;
+        text-align: center;
+      }
+
+      .reports-header h1 {
+        font-size: 2.5em;
+        margin-bottom: 10px;
+      }
+
+      .reports-header p {
+        font-size: 1.2em;
+        opacity: 0.9;
+      }
+
+      .auth-section {
+        padding: 30px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+      }
+
+      .report-controls {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        padding: 30px;
+      }
+
+      .control-panel {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 25px;
+        border: 2px solid #e9ecef;
+      }
+
+      .control-panel h3 {
+        color: #2c3e50;
+        margin-bottom: 20px;
+        font-size: 1.4em;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 10px;
+      }
+
+      .report-display {
+        margin: 30px;
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        display: none;
+      }
+
+      .report-header {
+        background: #2c3e50;
+        color: white;
+        padding: 20px;
+      }
+
+      .report-content {
+        padding: 30px;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+
+      .stat-card {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        color: white;
+        padding: 25px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+      }
+
+      .stat-card.secondary {
+        background: linear-gradient(135deg, #27ae60, #229954);
+        box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+      }
+
+      .stat-card.warning {
+        background: linear-gradient(135deg, #f39c12, #e67e22);
+        box-shadow: 0 5px 15px rgba(243, 156, 18, 0.3);
+      }
+
+      .stat-card h4 {
+        font-size: 2.2em;
+        margin-bottom: 10px;
+      }
+
+      .stat-card p {
+        font-size: 1.1em;
+        opacity: 0.9;
+      }
+
+      .attendees-table {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+      }
+
+      .table-header {
+        background: #34495e;
+        color: white;
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #dee2e6;
+      }
+
+      th {
+        background: #f8f9fa;
+        font-weight: 600;
+        color: #2c3e50;
+      }
+
+      tr:hover {
+        background: #f8f9fa;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #2c3e50;
+      }
+
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e9ecef;
+        border-radius: 5px;
+        font-size: 1em;
+        transition: border-color 0.3s ease;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: #3498db;
+      }
+
+      .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        margin: 5px;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 1px;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn-primary {
+        background: #3498db;
+        color: white;
+      }
+
+      .btn-success {
+        background: #27ae60;
+        color: white;
+      }
+
+      .btn-warning {
+        background: #f39c12;
+        color: white;
+      }
+
+      .btn-danger {
+        background: #e74c3c;
+        color: white;
+      }
+
+      .btn-large {
+        padding: 15px 30px;
+        font-size: 1.1em;
+        margin: 10px;
+      }
+
+      .response {
+        padding: 15px;
+        border-radius: 5px;
+        margin: 15px 0;
+      }
+
+      .success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      .break-analysis {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 20px 0;
+      }
+
+      .break-analysis h4 {
+        color: #856404;
+        margin-bottom: 15px;
+      }
+
+      .break-stat {
+        display: flex;
+        justify-content: space-between;
+        margin: 8px 0;
+        padding: 5px 0;
+        border-bottom: 1px solid #f0f0f0;
+      }
+
+      .top-performers {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 20px 0;
+      }
+
+      .top-performers h4 {
+        color: #155724;
+        margin-bottom: 15px;
+      }
+
+      .performer-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 10px 0;
+        padding: 10px;
+        background: white;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .performer-rank {
+        background: #27ae60;
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+      }
+
+      @media (max-width: 768px) {
+        .report-controls {
+          grid-template-columns: 1fr;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .reports-header h1 {
+          font-size: 2em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="reports-container">
+      <!-- Header -->
+      <div class="reports-header">
+        <h1>📊 Conference Reports Dashboard</h1>
+        <p>Comprehensive analytics and insights</p>
+      </div>
+
+      <!-- Authentication Section -->
+      <div class="auth-section">
+        <div class="form-group">
+          <label>Admin Authentication</label>
+          <div style="display: flex; gap: 10px; align-items: center">
+            <input
+              type="email"
+              id="adminEmail"
+              placeholder="Admin Email"
+              value="admin@example.com"
+              style="flex: 2"
+            />
+            <input
+              type="password"
+              id="adminPassword"
+              placeholder="Password"
+              value="admin123"
+              style="flex: 2"
+            />
+            <button class="btn btn-primary" onclick="loginAdmin()">
+              Login
+            </button>
+          </div>
+        </div>
+        <div id="authResponse" class="response" style="display: none"></div>
+      </div>
+
+      <!-- Report Controls -->
+      <div class="report-controls">
+        <!-- Event Report Generation -->
+        <div class="control-panel">
+          <h3>📈 Event Reports</h3>
+          <div class="form-group">
+            <label>Select Event</label>
+            <select id="eventSelect">
+              <option value="">Select an event...</option>
+              <option value="1">Spring Boot Conference 2025</option>
+              <option value="2">QR Code Workshop</option>
+              <option value="3">Past Tech Meetup</option>
+            </select>
+          </div>
+
+          <div style="text-align: center">
+            <button
+              class="btn btn-primary btn-large"
+              onclick="generateEventReport()"
+            >
+              📊 Generate Report
+            </button>
+            <button class="btn btn-success" onclick="downloadCSV()">
+              📥 Download CSV
+            </button>
+            <button class="btn btn-warning" onclick="getTopPerformers()">
+              🏆 Top Performers
+            </button>
+          </div>
+        </div>
+
+        <!-- Analysis Tools -->
+        <div class="control-panel">
+          <h3>🔍 Analysis Tools</h3>
+          <div style="text-align: center">
+            <button
+              class="btn btn-primary btn-large"
+              onclick="getBreakAnalysis()"
+            >
+              ⏸️ Break Analysis
+            </button>
+            <button
+              class="btn btn-success btn-large"
+              onclick="getEventSummary()"
+            >
+              📋 Quick Summary
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Report Display -->
+      <div class="report-display" id="reportDisplay">
+        <div class="report-header">
+          <h3 id="reportTitle">Event Report</h3>
+          <div id="reportMeta">
+            Generated on: <span id="reportDate">--</span>
+          </div>
+        </div>
+
+        <div class="report-content">
+          <!-- Summary Statistics -->
+          <div class="stats-grid" id="summaryStats">
+            <!-- Stats will be populated here -->
+          </div>
+
+          <!-- Break Analysis -->
+          <div class="break-analysis" id="breakAnalysis" style="display: none">
+            <h4>⏸️ Break Analysis</h4>
+            <div id="breakStats">
+              <!-- Break statistics will be populated here -->
+            </div>
+          </div>
+
+          <!-- Top Performers -->
+          <div class="top-performers" id="topPerformers" style="display: none">
+            <h4>🏆 Top Performers</h4>
+            <div id="performersList">
+              <!-- Top performers will be populated here -->
+            </div>
+          </div>
+
+          <!-- Detailed Attendee Table -->
+          <div
+            class="attendees-table"
+            id="attendeesTable"
+            style="display: none"
+          >
+            <div class="table-header">
+              <h4>👥 Detailed Attendee Report</h4>
+              <span id="attendeeCount">0 attendees</span>
+            </div>
+
+            <div style="overflow-x: auto">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Check-in Time</th>
+                    <th>Active Time</th>
+                    <th>Break Time</th>
+                    <th>Breaks</th>
+                    <th>Participation</th>
+                  </tr>
+                </thead>
+                <tbody id="attendeesTableBody">
+                  <!-- Attendee data will be populated here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let authToken = "";
+      let currentEventId = null;
+      let currentReport = null;
+
+      // Authentication
+      async function loginAdmin() {
+        const email = document.getElementById("adminEmail").value;
+        const password = document.getElementById("adminPassword").value;
+
+        try {
+          const response = await fetch("/auth/signin", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            authToken = data.token;
+            showResponse(
+              "authResponse",
+              "Login successful! Welcome, Admin.",
+              "success"
+            );
+          } else {
+            showResponse(
+              "authResponse",
+              `Login failed: ${data.message || "Unknown error"}`,
+              "error"
+            );
+          }
+        } catch (error) {
+          showResponse(
+            "authResponse",
+            `Login error: ${error.message}`,
+            "error"
+          );
+        }
+      }
+
+      // Generate comprehensive event report
+      async function generateEventReport() {
+        const eventId = document.getElementById("eventSelect").value;
+        if (!eventId || !authToken) {
+          alert("Please login and select an event first");
+          return;
+        }
+
+        currentEventId = eventId;
+
+        try {
+          const response = await fetch(
+            `/api/reports/event/${eventId}?reportedBy=Admin`,
+            {
+              headers: { Authorization: `Bearer ${authToken}` },
+            }
+          );
+
+          const report = await response.json();
+
+          if (response.ok) {
+            currentReport = report;
+            displayEventReport(report);
+          } else {
+            alert(`Failed to generate report: ${report.error}`);
+          }
+        } catch (error) {
+          alert(`Error generating report: ${error.message}`);
+        }
+      }
+
+      // Display event report
+      function displayEventReport(report) {
+        document.getElementById("reportDisplay").style.display = "block";
+        document.getElementById(
+          "reportTitle"
+        ).textContent = `${report.eventName} - Full Report`;
+        document.getElementById("reportDate").textContent = new Date(
+          report.reportGeneratedAt
+        ).toLocaleString();
+
+        // Summary statistics
+        const summaryStats = document.getElementById("summaryStats");
+        summaryStats.innerHTML = `
+          <div class="stat-card">
+            <h4>${report.totalCheckedInAttendees}</h4>
+            <p>Total Attendees</p>
+          </div>
+          <div class="stat-card secondary">
+            <h4>${report.formattedTotalActiveTime}</h4>
+            <p>Total Active Time</p>
+          </div>
+          <div class="stat-card warning">
+            <h4>${report.formattedTotalBreakTime}</h4>
+            <p>Total Break Time</p>
+          </div>
+          <div class="stat-card">
+            <h4>${report.attendanceRate.toFixed(1)}%</h4>
+            <p>Attendance Rate</p>
+          </div>
+          <div class="stat-card secondary">
+            <h4>${report.averageParticipationRate.toFixed(1)}%</h4>
+            <p>Avg Participation</p>
+          </div>
+          <div class="stat-card warning">
+            <h4>${report.totalBreaks}</h4>
+            <p>Total Breaks</p>
+          </div>
+        `;
+
+        // Show attendee table
+        displayAttendeesTable(report.attendeeReports);
+      }
+
+      // Display attendees table
+      function displayAttendeesTable(attendees) {
+        const table = document.getElementById("attendeesTable");
+        const tbody = document.getElementById("attendeesTableBody");
+        const countEl = document.getElementById("attendeeCount");
+
+        table.style.display = "block";
+        countEl.textContent = `${attendees.length} attendees`;
+
+        tbody.innerHTML = attendees
+          .map(
+            (attendee) => `
+            <tr>
+              <td>${attendee.userName}</td>
+              <td>${attendee.userEmail}</td>
+              <td>${formatDateTime(attendee.checkInTime)}</td>
+              <td>${attendee.formattedActiveTime}</td>
+              <td>${attendee.formattedBreakTime}</td>
+              <td>${attendee.numberOfBreaks}</td>
+              <td>${attendee.formattedParticipationRate}</td>
+            </tr>
+          `
+          )
+          .join("");
+      }
+
+      // Get event summary
+      async function getEventSummary() {
+        const eventId = document.getElementById("eventSelect").value;
+        if (!eventId || !authToken) {
+          alert("Please login and select an event first");
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            `/api/reports/event/${eventId}/summary`,
+            {
+              headers: { Authorization: `Bearer ${authToken}` },
+            }
+          );
+
+          const summary = await response.json();
+
+          if (response.ok) {
+            displayQuickSummary(summary);
+          } else {
+            alert(`Failed to get summary: ${summary.error}`);
+          }
+        } catch (error) {
+          alert(`Error getting summary: ${error.message}`);
+        }
+      }
+
+      // Display quick summary
+      function displayQuickSummary(summary) {
+        document.getElementById("reportDisplay").style.display = "block";
+        document.getElementById(
+          "reportTitle"
+        ).textContent = `${summary.eventName} - Quick Summary`;
+        document.getElementById("reportDate").textContent =
+          new Date().toLocaleString();
+
+        // Hide other sections
+        document.getElementById("breakAnalysis").style.display = "none";
+        document.getElementById("topPerformers").style.display = "none";
+        document.getElementById("attendeesTable").style.display = "none";
+
+        const summaryStats = document.getElementById("summaryStats");
+        summaryStats.innerHTML = `
+          <div class="stat-card">
+            <h4>${summary.totalAttendees}</h4>
+            <p>Total Attendees</p>
+          </div>
+          <div class="stat-card secondary">
+            <h4>${summary.totalActiveTime}</h4>
+            <p>Total Active Time</p>
+          </div>
+          <div class="stat-card warning">
+            <h4>${summary.totalBreakTime}</h4>
+            <p>Total Break Time</p>
+          </div>
+          <div class="stat-card">
+            <h4>${summary.attendanceRate}</h4>
+            <p>Attendance Rate</p>
+          </div>
+          <div class="stat-card secondary">
+            <h4>${summary.participationRate}</h4>
+            <p>Participation Rate</p>
+          </div>
+          <div class="stat-card warning">
+            <h4>${summary.totalBreaks}</h4>
+            <p>Total Breaks</p>
+          </div>
+        `;
+      }
+
+      // Get break analysis
+      async function getBreakAnalysis() {
+        const eventId = document.getElementById("eventSelect").value;
+        if (!eventId || !authToken) {
+          alert("Please login and select an event first");
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            `/api/reports/event/${eventId}/break-analysis`,
+            {
+              headers: { Authorization: `Bearer ${authToken}` },
+            }
+          );
+
+          const analysis = await response.json();
+
+          if (response.ok) {
+            displayBreakAnalysis(analysis);
+          } else {
+            alert(`Failed to get break analysis: ${analysis.error}`);
+          }
+        } catch (error) {
+          alert(`Error getting break analysis: ${error.message}`);
+        }
+      }
+
+      // Display break analysis
+      function displayBreakAnalysis(analysis) {
+        document.getElementById("reportDisplay").style.display = "block";
+        document.getElementById(
+          "reportTitle"
+        ).textContent = `${analysis.eventName} - Break Analysis`;
+        document.getElementById("reportDate").textContent =
+          new Date().toLocaleString();
+
+        // Show break analysis section
+        const breakAnalysis = document.getElementById("breakAnalysis");
+        const breakStats = document.getElementById("breakStats");
+
+        breakAnalysis.style.display = "block";
+        breakStats.innerHTML = `
+          <div class="break-stat">
+            <span>Total Breaks:</span>
+            <strong>${analysis.totalBreaks}</strong>
+          </div>
+          <div class="break-stat">
+            <span>Longest Break:</span>
+            <strong>${analysis.longestBreakDuration}</strong>
+          </div>
+          <div class="break-stat">
+            <span>Shortest Break:</span>
+            <strong>${analysis.shortestBreakDuration}</strong>
+          </div>
+          <div class="break-stat">
+            <span>Most Common Type:</span>
+            <strong>${analysis.mostCommonBreakType}</strong>
+          </div>
+          <div class="break-stat">
+            <span>Average Break Time:</span>
+            <strong>${analysis.averageBreakTime}</strong>
+          </div>
+          <div class="break-stat">
+            <span>Total Break Time:</span>
+            <strong>${analysis.totalBreakTime}</strong>
+          </div>
+        `;
+
+        // Hide other sections
+        document.getElementById("topPerformers").style.display = "none";
+        document.getElementById("attendeesTable").style.display = "none";
+        document.getElementById("summaryStats").innerHTML = "";
+      }
+
+      // Get top performers
+      async function getTopPerformers() {
+        const eventId = document.getElementById("eventSelect").value;
+        if (!eventId || !authToken) {
+          alert("Please login and select an event first");
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            `/api/reports/event/${eventId}/top-performers?limit=5`,
+            {
+              headers: { Authorization: `Bearer ${authToken}` },
+            }
+          );
+
+          const data = await response.json();
+
+          if (response.ok) {
+            displayTopPerformers(data);
+          } else {
+            alert(`Failed to get top performers: ${data.error}`);
+          }
+        } catch (error) {
+          alert(`Error getting top performers: ${error.message}`);
+        }
+      }
+
+      // Display top performers
+      function displayTopPerformers(data) {
+        document.getElementById("reportDisplay").style.display = "block";
+        document.getElementById(
+          "reportTitle"
+        ).textContent = `${data.eventName} - Top Performers`;
+        document.getElementById("reportDate").textContent =
+          new Date().toLocaleString();
+
+        // Show top performers section
+        const topPerformers = document.getElementById("topPerformers");
+        const performersList = document.getElementById("performersList");
+
+        topPerformers.style.display = "block";
+        performersList.innerHTML = data.topPerformers
+          .map(
+            (performer, index) => `
+            <div class="performer-item">
+              <div style="display: flex; align-items: center; gap: 15px;">
+                <div class="performer-rank">${index + 1}</div>
+                <div>
+                  <strong>${performer.userName}</strong><br>
+                  <small>${performer.userEmail}</small>
+                </div>
+              </div>
+              <div style="text-align: right;">
+                <strong>${performer.formattedParticipationRate}</strong><br>
+                <small>${performer.formattedActiveTime} active</small>
+              </div>
+            </div>
+          `
+          )
+          .join("");
+
+        // Hide other sections
+        document.getElementById("breakAnalysis").style.display = "none";
+        document.getElementById("attendeesTable").style.display = "none";
+        document.getElementById("summaryStats").innerHTML = "";
+      }
+
+      // Download CSV report
+      async function downloadCSV() {
+        const eventId = document.getElementById("eventSelect").value;
+        if (!eventId || !authToken) {
+          alert("Please login and select an event first");
+          return;
+        }
+
+        try {
+          const response = await fetch(`/api/reports/event/${eventId}/csv`, {
+            headers: { Authorization: `Bearer ${authToken}` },
+          });
+
+          if (response.ok) {
+            const csvData = await response.text();
+            const blob = new Blob([csvData], { type: "text/csv" });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `event_${eventId}_report.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+
+            alert("CSV report downloaded successfully!");
+          } else {
+            const error = await response.json();
+            alert(`Failed to download CSV: ${error.error}`);
+          }
+        } catch (error) {
+          alert(`Error downloading CSV: ${error.message}`);
+        }
+      }
+
+      // Utility functions
+      function formatDateTime(dateTime) {
+        if (!dateTime) return "--:--";
+        return new Date(dateTime).toLocaleString();
+      }
+
+      function showResponse(elementId, message, type) {
+        const element = document.getElementById(elementId);
+        element.textContent = message;
+        element.className = `response ${type}`;
+        element.style.display = "block";
+        setTimeout(() => {
+          element.style.display = "none";
+        }, 5000);
+      }
+    </script>
+  </body>
+</html>

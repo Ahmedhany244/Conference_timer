@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QR Code System Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .section {
+        margin: 20px 0;
+        padding: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      .qr-code {
+        margin: 10px 0;
+        text-align: center;
+      }
+      .qr-code img {
+        max-width: 300px;
+        border: 1px solid #ddd;
+        padding: 10px;
+      }
+      input,
+      button,
+      select {
+        margin: 5px;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+      }
+      button {
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      .error {
+        color: red;
+      }
+      .success {
+        color: green;
+      }
+      .response {
+        background-color: #f8f9fa;
+        padding: 10px;
+        border-radius: 3px;
+        margin: 10px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>QR Code System Test Page</h1>
+
+    <!-- Authentication Section -->
+    <div class="section">
+      <h2>1. Authentication</h2>
+      <p><strong>Test Credentials:</strong></p>
+      <ul>
+        <li>User: test@example.com / password</li>
+        <li>User: john@example.com / password123</li>
+        <li>Admin: admin@example.com / admin123</li>
+      </ul>
+      <div>
+        <select id="userSelect" onchange="fillCredentials()">
+          <option value="">Select test user...</option>
+          <option value="test@example.com|password">Test User</option>
+          <option value="john@example.com|password123">John Doe</option>
+          <option value="admin@example.com|admin123">Admin User</option>
+        </select>
+      </div>
+      <div>
+        <input
+          type="email"
+          id="loginEmail"
+          placeholder="Email"
+          value="test@example.com"
+        />
+        <input
+          type="password"
+          id="loginPassword"
+          placeholder="Password"
+          value="password"
+        />
+        <button onclick="login()">Login</button>
+      </div>
+      <div id="authResponse" class="response"></div>
+    </div>
+
+    <!-- QR Generation Section -->
+    <div class="section">
+      <h2>2. Generate QR Code</h2>
+      <div>
+        <input type="number" id="userId" placeholder="User ID" value="1" />
+        <input type="number" id="eventId" placeholder="Event ID" value="1" />
+        <button onclick="generateQR()">Generate QR Code</button>
+      </div>
+      <div id="qrResponse" class="response"></div>
+      <div id="qrCodeDisplay" class="qr-code"></div>
+    </div>
+
+    <!-- QR Scanning Section -->
+    <div class="section">
+      <h2>3. Scan QR Code (Admin)</h2>
+      <div>
+        <textarea
+          id="qrToken"
+          placeholder="Paste JWT token here"
+          rows="3"
+          style="width: 100%"
+        ></textarea>
+        <input
+          type="text"
+          id="staffMember"
+          placeholder="Staff Member Name"
+          value="Admin User"
+        />
+        <button onclick="scanQR()">Scan QR Code</button>
+      </div>
+      <div id="scanResponse" class="response"></div>
+    </div>
+
+    <!-- Attendance Check Section -->
+    <div class="section">
+      <h2>4. Check Attendance</h2>
+      <div>
+        <input type="number" id="checkUserId" placeholder="User ID" value="1" />
+        <input
+          type="number"
+          id="checkEventId"
+          placeholder="Event ID"
+          value="1"
+        />
+        <button onclick="checkAttendance()">Check Attendance</button>
+      </div>
+      <div id="attendanceResponse" class="response"></div>
+    </div>
+
+    <script>
+      let authToken = "";
+
+      // Fill credentials based on selection
+      function fillCredentials() {
+        const select = document.getElementById("userSelect");
+        const value = select.value;
+        if (value) {
+          const [email, password] = value.split("|");
+          document.getElementById("loginEmail").value = email;
+          document.getElementById("loginPassword").value = password;
+        }
+      }
+
+      // Login function
+      async function login() {
+        const email = document.getElementById("loginEmail").value;
+        const password = document.getElementById("loginPassword").value;
+
+        try {
+          const response = await fetch("/auth/signin", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            authToken = data.token;
+            document.getElementById(
+              "authResponse"
+            ).innerHTML = `<div class="success">Login successful! Role: ${data.role}</div>`;
+          } else {
+            document.getElementById(
+              "authResponse"
+            ).innerHTML = `<div class="error">Login failed: ${
+              data.message || "Unknown error"
+            }</div>`;
+          }
+        } catch (error) {
+          document.getElementById(
+            "authResponse"
+          ).innerHTML = `<div class="error">Login error: ${error.message}</div>`;
+        }
+      }
+
+      // Generate QR Code
+      async function generateQR() {
+        if (!authToken) {
+          alert("Please login first!");
+          return;
+        }
+
+        const userId = document.getElementById("userId").value;
+        const eventId = document.getElementById("eventId").value;
+
+        try {
+          const response = await fetch("/api/qr/generate", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${authToken}`,
+            },
+            body: JSON.stringify({
+              userId: parseInt(userId),
+              eventId: parseInt(eventId),
+            }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            document.getElementById(
+              "qrResponse"
+            ).innerHTML = `<div class="success">
+                            QR Code generated successfully!<br>
+                            Event: ${data.eventName}<br>
+                            User: ${data.userName}<br>
+                            Expires: ${data.expiryTime}
+                        </div>`;
+
+            document.getElementById(
+              "qrCodeDisplay"
+            ).innerHTML = `<img src="${data.qrCodeBase64}" alt="QR Code">`;
+
+            // Auto-fill the token in scan section
+            document.getElementById("qrToken").value = data.token;
+          } else {
+            document.getElementById(
+              "qrResponse"
+            ).innerHTML = `<div class="error">QR Generation failed: ${data.error}</div>`;
+          }
+        } catch (error) {
+          document.getElementById(
+            "qrResponse"
+          ).innerHTML = `<div class="error">QR Generation error: ${error.message}</div>`;
+        }
+      }
+
+      // Scan QR Code
+      async function scanQR() {
+        if (!authToken) {
+          alert("Please login first!");
+          return;
+        }
+
+        const qrToken = document.getElementById("qrToken").value;
+        const staffMember = document.getElementById("staffMember").value;
+
+        try {
+          const response = await fetch("/api/qr/scan", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${authToken}`,
+            },
+            body: JSON.stringify({ qrToken, staffMember }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            document.getElementById(
+              "scanResponse"
+            ).innerHTML = `<div class="success">
+                            ${data.message}<br>
+                            User: ${data.attendance.userName}<br>
+                            Event: ${data.attendance.eventName}<br>
+                            Check-in Time: ${data.attendance.checkInTime}<br>
+                            Checked in by: ${data.attendance.checkedInBy}
+                        </div>`;
+          } else {
+            document.getElementById(
+              "scanResponse"
+            ).innerHTML = `<div class="error">Scan failed: ${data.error}</div>`;
+          }
+        } catch (error) {
+          document.getElementById(
+            "scanResponse"
+          ).innerHTML = `<div class="error">Scan error: ${error.message}</div>`;
+        }
+      }
+
+      // Check Attendance
+      async function checkAttendance() {
+        if (!authToken) {
+          alert("Please login first!");
+          return;
+        }
+
+        const userId = document.getElementById("checkUserId").value;
+        const eventId = document.getElementById("checkEventId").value;
+
+        try {
+          const response = await fetch(
+            `/api/qr/attendance/check/${userId}/${eventId}`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${authToken}`,
+              },
+            }
+          );
+
+          const data = await response.json();
+
+          if (response.ok) {
+            document.getElementById(
+              "attendanceResponse"
+            ).innerHTML = `<div class="success">
+                            User ID: ${data.userId}<br>
+                            Event ID: ${data.eventId}<br>
+                            Has Attended: ${data.hasAttended ? "Yes" : "No"}
+                        </div>`;
+          } else {
+            document.getElementById(
+              "attendanceResponse"
+            ).innerHTML = `<div class="error">Check failed: ${data.error}</div>`;
+          }
+        } catch (error) {
+          document.getElementById(
+            "attendanceResponse"
+          ).innerHTML = `<div class="error">Check error: ${error.message}</div>`;
+        }
+      }
+    </script>
+  </body>
+</html>
