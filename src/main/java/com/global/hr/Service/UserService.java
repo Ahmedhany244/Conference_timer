@@ -27,13 +27,19 @@ public class UserService {
 
 
 	public UserDtoResponse registerUser(UserDtoRequest dto) {
+        // Check if email already exists
+        userRepo.findByEmail(dto.getEmail())
+                .ifPresent(u -> {
+                    throw new RuntimeException("Email already registered");
+                });
+
         User user = new User();
         user.setName(dto.getName());
         user.setEmail(dto.getEmail());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
-        System.out.println(user.getName()+"has been registered");
+        System.out.println(user.getName() + " has been registered");
         userRepo.save(user);
-        return new UserDtoResponse(user.getName(),user.getEmail());
+        return new UserDtoResponse(user.getName(), user.getEmail());
     }
 
 

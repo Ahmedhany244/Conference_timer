@@ -3,7 +3,7 @@ import { ApiError } from "./types";
 
 // API Configuration
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://192.168.1.32:8080";
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
 // Create axios instance
 export const apiClient: AxiosInstance = axios.create({
@@ -11,7 +11,7 @@ export const apiClient: AxiosInstance = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 10000,
+  timeout: 30000, // Increased timeout to 30 seconds for better reliability
 });
 
 // Request interceptor to add JWT token
@@ -37,14 +37,21 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
     if (error.response?.status === 401) {
-      // Handle unauthorized - clear all auth data and redirect
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      localStorage.removeItem("role");
-      sessionStorage.clear();
+      // Check if this is a login/register attempt - don't redirect for auth failures
+      const isAuthAttempt =
+        error.config?.url?.includes("/signin") ||
+        error.config?.url?.includes("/register");
 
-      // Force reload to clear any cached state
-      window.location.replace("/login");
+      if (!isAuthAttempt) {
+        // Only redirect for authenticated requests with expired/invalid tokens
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        localStorage.removeItem("role");
+        sessionStorage.clear();
+
+        // Force reload to clear any cached state
+        window.location.replace("/login");
+      }
     }
 
     const apiError: ApiError = {
@@ -80,6 +87,12 @@ export const API_ENDPOINTS = {
 
   // Admin Dashboard
   DASHBOARD_STATS: "/admin/dashboard/stats",
+
+  // Analytics
+  ANALYTICS_OVERVIEW: "/analytics/overview",
+  ANALYTICS_EVENTS: "/analytics/events",
+  ANALYTICS_TIME_PATTERNS: "/analytics/time-patterns",
+  ANALYTICS_ATTENDANCE_RATES: "/analytics/attendance-rates",
 
   // Attendee
   ATTENDEE_EVENTS: "/attendee/events",

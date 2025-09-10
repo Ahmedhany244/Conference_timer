@@ -76,7 +76,7 @@ function QRCodeDialog({
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Event QR Code</DialogTitle>
+          <DialogTitle>{registration.eventName}</DialogTitle>
           <DialogDescription>
             Use this QR code for event check-in and attendance tracking
           </DialogDescription>
@@ -127,28 +127,39 @@ function RegistrationCard({
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="space-y-1">
-            <CardTitle className="text-lg">
-              Event #{registration.eventId}
-            </CardTitle>
+            <CardTitle className="text-lg">{registration.eventName}</CardTitle>
             <CardDescription className="flex items-center space-x-2">
               <Calendar className="h-4 w-4" />
-              <span>Registration Code: {registration.code}</span>
+              <span>Event ID: #{registration.eventId}</span>
             </CardDescription>
           </div>
           <Badge variant="secondary">Registered</Badge>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <p className="text-sm font-medium">Registration Code</p>
-          <p className="text-xs text-muted-foreground font-mono bg-muted px-2 py-1 rounded">
-            {registration.code}
-          </p>
+        <div className="space-y-3">
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-gray-700">
+              Registration Code
+            </p>
+            <div className="bg-gray-50 border rounded-lg p-3">
+              <p className="text-sm font-mono text-gray-900 break-all">
+                {registration.code}
+              </p>
+            </div>
+          </div>
+
+          <div className="text-xs text-gray-500 bg-blue-50 border border-blue-200 rounded-lg p-2">
+            <div className="flex items-center space-x-1">
+              <Calendar className="h-3 w-3 text-blue-600" />
+              <span>Event ID: #{registration.eventId}</span>
+            </div>
+          </div>
         </div>
 
-        <div className="flex space-x-2">
+        <div className="flex space-x-2 pt-2">
           <QRCodeDialog registration={registration} />
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" className="flex-1">
             <Eye className="h-4 w-4 mr-2" />
             Details
           </Button>
@@ -188,7 +199,9 @@ export default function RegistrationsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-xl font-semibold text-green-800">
-                  Event #{eventId}
+                  {focusedRegistration
+                    ? focusedRegistration.eventName
+                    : `Event #${eventId}`}
                 </h3>
                 {focusedRegistration ? (
                   <p className="text-green-600">

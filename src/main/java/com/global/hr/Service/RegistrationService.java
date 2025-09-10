@@ -58,7 +58,7 @@ public class RegistrationService {
         byte[] png = qrCodeService.generatePng(code, 300, 300);
         String base64 = Base64.getEncoder().encodeToString(png);
 
-        return new RegistrationDtoResponse(reg.getId(), event.getId(), code, base64);
+        return new RegistrationDtoResponse(reg.getId(), event.getId(), event.getEventName(), code, base64);
     }
 
     public byte[] getQrPngForRegistration(Long regId, Long requestingUserId) {
@@ -74,7 +74,8 @@ public class RegistrationService {
         return regRepo.findByUser(user).stream()
                 .map(reg -> new RegistrationDtoResponse(
                     reg.getId(), 
-                    reg.getEvent().getId(), 
+                    reg.getEvent().getId(),
+                    reg.getEvent().getEventName(),
                     reg.getCode(), 
                     Base64.getEncoder().encodeToString(qrCodeService.generatePng(reg.getCode(), 300, 300))
                 ))

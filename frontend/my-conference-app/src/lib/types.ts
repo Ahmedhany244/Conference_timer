@@ -67,6 +67,7 @@ export interface EventDtoResponse {
 export interface RegistrationDtoResponse {
   registrationId: number;
   eventId: number;
+  eventName: string;
   code: string;
   qrBase64: string;
 }
@@ -181,4 +182,93 @@ export interface EventFormData {
   eventName: string;
   eventStartTime: string;
   eventEndTime: string;
+}
+
+// Advanced Analytics Types
+export interface AnalyticsOverviewResponse {
+  averageAttendanceTimeHours: number;
+  medianAttendanceTimeHours: number;
+  totalActiveAttendees: number;
+  overallAttendanceRate: number;
+  totalScanEvents: number;
+  averageSessionDuration: number;
+}
+
+export interface EventAnalyticsResponse {
+  eventId: number;
+  eventName: string;
+  totalRegistrations: number;
+  totalAttendees: number;
+  attendanceRate: number;
+  averageAttendanceTimeHours: number;
+  totalAttendanceHours: number;
+  totalCheckIns: number;
+  totalCheckOuts: number;
+  averageSessionDuration: number;
+  eventStartTime: string;
+  eventEndTime: string;
+}
+
+export interface TimeAnalyticsResponse {
+  hourlyActivity: HourlyActivityResponse[];
+  dailyActivity: DailyActivityResponse[];
+  peakCheckInTime: PeakTimeResponse;
+  peakCheckOutTime: PeakTimeResponse;
+  averageSessionLength: number;
+  longestSession: number;
+  shortestSession: number;
+}
+
+export interface HourlyActivityResponse {
+  hour: number;
+  checkInCount: number;
+  checkOutCount: number;
+  totalActivity: number;
+}
+
+export interface DailyActivityResponse {
+  date: string;
+  totalActivity: number;
+  uniqueAttendees: number;
+  totalHours: number;
+}
+
+export interface PeakTimeResponse {
+  hour: number;
+  activityCount: number;
+  timeLabel: string;
+}
+
+export interface AttendanceRateBreakdownResponse {
+  overallAttendanceRate: number;
+  eventRates: EventRateResponse[];
+  rateDistribution: RateRangeResponse;
+  topAttendees: UserAttendanceResponse[];
+  averageRegistrationToAttendanceTime: number;
+}
+
+export interface EventRateResponse {
+  eventId: number;
+  eventName: string;
+  registrations: number;
+  attendees: number;
+  attendanceRate: number;
+  category: string;
+}
+
+export interface RateRangeResponse {
+  excellent: number; // 90-100%
+  good: number; // 70-89%
+  average: number; // 50-69%
+  poor: number; // 0-49%
+}
+
+export interface UserAttendanceResponse {
+  userId: number;
+  userName: string;
+  userEmail: string;
+  eventsRegistered: number;
+  eventsAttended: number;
+  attendanceRate: number;
+  totalHours: number;
 }
